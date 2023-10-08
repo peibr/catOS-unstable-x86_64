@@ -1,4 +1,4 @@
-#include "vgaprint.h"
+#include "headers/vgaprint.h"
 /* Hardware text mode color constants. */
 
 void kernel_main(void) 

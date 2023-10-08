@@ -2,12 +2,20 @@ GCCPARAMS = -m32
 ASPARAMS = --32
 LDPARAMS = -melf_i386
 
+GEAR = gear
+HEADERS = gear/headers 
+LOAD = loader
+BIN = bin
+
+
 objects = boot.o kernel.o
 
-%.o: %.c
+%.o: $(HEADERS)/%.c
+	gcc $(GCCPARAMS) -o $@ -c $<
+%.o: $(GEAR)/%.c
 	gcc $(GCCPARAMS) -o $@ -c $<
 
-%.o: %.s
+%.o: $(LOAD)/%.s
 	as $(ASPARAMS) -o $@ $<
 
 mykernel.bin: linker.ld $(objects)

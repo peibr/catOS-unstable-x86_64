@@ -3,19 +3,28 @@ ASPARAMS = --32
 LDPARAMS = -melf_i386
 
 GEAR = gear
-HEADERS = gear/headers 
+HEADERS = gear/headers
 LOAD = loader
-BIN = bin
 
+SRC_DIR = gear
+BIN_DIR = bin
 
-objects = boot.o kernel.o
+objects = $(BIN_DIR)/boot.o $(BIN_DIR)/kernel.o
 
-%.o: $(HEADERS)/%.c
+.PHONY: all clean
+
+all: $(BIN_DIR) mykernel.iso
+
+$(BIN_DIR):
+	mkdir -p $(BIN_DIR)
+
+$(BIN_DIR)/%.o: $(SRC_DIR)/%.c
 	gcc $(GCCPARAMS) -o $@ -c $<
-%.o: $(GEAR)/%.c
+
+$(BIN_DIR)/%.o: $(GEAR)/%.c
 	gcc $(GCCPARAMS) -o $@ -c $<
 
-%.o: $(LOAD)/%.s
+$(BIN_DIR)/%.o: $(LOAD)/%.s
 	as $(ASPARAMS) -o $@ $<
 
 mykernel.bin: linker.ld $(objects)
@@ -29,6 +38,9 @@ mykernel.iso: mykernel.bin
 	cp mykernel.bin isodir/boot/mykernel.bin
 	cp grub.cfg isodir/boot/grub/grub.cfg
 	grub-mkrescue -o mykernel.iso isodir
-	rm -rf iso
+
+clean:
+	rm -rf $(BIN_DIR) mykernel.bin isodir mykernel.iso
+
 run: mykernel.iso
 	qemu-system-i386 -cdrom mykernel.iso
